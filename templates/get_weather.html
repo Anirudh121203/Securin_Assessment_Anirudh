@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Details</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container mt-5">
@@ -23,7 +24,70 @@
             <div class="col-md-12">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h4>Temperature Data of Delhi</h4>
+                        <h4 class="mb-3">Temperature Data of Delhi</h4>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="tempFilter" class="form-label">Temperature Range</label>
+                                <select class="form-select" id="tempFilter" onchange="applyFilters()">
+                                    <option value="">All Temperatures</option>
+                                    <option value="0-10">0°C - 10°C</option>
+                                    <option value="11-20">11°C - 20°C</option>
+                                    <option value="21-30">21°C - 30°C</option>
+                                    <option value="31-40">31°C - 40°C</option>
+                                    <option value="41+">Above 40°C</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="humidityFilter" class="form-label">Humidity Range</label>
+                                <select class="form-select" id="humidityFilter" onchange="applyFilters()">
+                                    <option value="">All Humidity Levels</option>
+                                    <option value="0-20">0% - 20%</option>
+                                    <option value="21-40">21% - 40%</option>
+                                    <option value="41-60">41% - 60%</option>
+                                    <option value="61-80">61% - 80%</option>
+                                    <option value="81-100">81% - 100%</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="pressureFilter" class="form-label">Pressure Range</label>
+                                <select class="form-select" id="pressureFilter" onchange="applyFilters()">
+                                    <option value="">All Pressure Levels</option>
+                                    <option value="980-990">980 - 990 hPa</option>
+                                    <option value="991-1000">991 - 1000 hPa</option>
+                                    <option value="1001-1010">1001 - 1010 hPa</option>
+                                    <option value="1011-1020">1011 - 1020 hPa</option>
+                                    <option value="1021+">Above 1020 hPa</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Select Fields to Display</label>
+                                <div class="field-selection">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="temperature" id="temperatureField" checked onchange="updateVisibleColumns()">
+                                        <label class="form-check-label" for="temperatureField">
+                                            Temperature
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="humidity" id="humidityField" checked onchange="updateVisibleColumns()">
+                                        <label class="form-check-label" for="humidityField">
+                                            Humidity
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="pressure" id="pressureField" checked onchange="updateVisibleColumns()">
+                                        <label class="form-check-label" for="pressureField">
+                                            Pressure
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -32,10 +96,10 @@
         <table class="table table-striped mt-4">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Temperature (°C)</th>
-                    <th>Humidity (%)</th>
-                    <th>Pressure (hPa)</th>
+                    <th class="date-column">Date</th>
+                    <th class="temp-column">Temperature (°C)</th>
+                    <th class="humidity-column">Humidity (%)</th>
+                    <th class="pressure-column">Pressure (hPa)</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,10 +116,114 @@
         {% else %}
         <p class="text-center mt-4 text-warning">No data available for the specified criteria.</p>
         {% endif %}
-
-        
     </div>
 
+    <style>
+        .hidden {
+            display: none;
+        }
+        .field-selection {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        .field-selection .form-check {
+            margin-bottom: 8px;
+        }
+        .field-selection .form-check:last-child {
+            margin-bottom: 0;
+        }
+    </style>
 
+    <script>
+        function updateVisibleColumns() {
+            const columns = {
+                'temperature': 1,
+                'humidity': 2,
+                'pressure': 3
+            };
+
+            const selectedFields = Object.keys(columns).filter(field => 
+                document.getElementById(field + 'Field').checked
+            );
+
+            const headers = document.querySelectorAll('thead th');
+            headers.forEach((header, index) => {
+                if (index === 0) return; 
+                const isVisible = selectedFields.includes(Object.keys(columns).find(key => columns[key] === index));
+                header.style.display = isVisible ? '' : 'none';
+            });
+
+
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                Array.from(row.cells).forEach((cell, index) => {
+                    if (index === 0) return; 
+                    cell.style.display = selectedFields.includes(Object.keys(columns).find(key => columns[key] === index)) ? '' : 'none';
+                });
+            });
+        }
+
+        function applyFilters() {
+            const rows = document.querySelectorAll('tbody tr');
+            const tempFilter = document.getElementById('tempFilter').value;
+            const humidityFilter = document.getElementById('humidityFilter').value;
+            const pressureFilter = document.getElementById('pressureFilter').value;
+
+            rows.forEach(row => {
+                const temp = parseFloat(row.cells[1].textContent);
+                const humidity = parseFloat(row.cells[2].textContent);
+                const pressure = parseFloat(row.cells[3].textContent);
+
+                let showRow = true;
+
+                if (tempFilter) {
+                    const [min, max] = tempFilter.split('-').map(Number);
+                    if (max) {
+                        showRow = showRow && (temp >= min && temp <= max);
+                    } else {
+                        showRow = showRow && (temp >= min);
+                    }
+                }
+
+                if (humidityFilter) {
+                    const [min, max] = humidityFilter.split('-').map(Number);
+                    showRow = showRow && (humidity >= min && humidity <= max);
+                }
+
+                if (pressureFilter) {
+                    const [min, max] = pressureFilter.split('-').map(Number);
+                    if (max) {
+                        showRow = showRow && (pressure >= min && pressure <= max);
+                    } else {
+                        showRow = showRow && (pressure >= min);
+                    }
+                }
+
+                row.classList.toggle('hidden', !showRow);
+            });
+        }
+
+        function resetFilters() {
+
+            document.getElementById('tempFilter').value = '';
+            document.getElementById('humidityFilter').value = '';
+            document.getElementById('pressureFilter').value = '';
+            
+
+            ['temperature', 'humidity', 'pressure'].forEach(field => {
+                document.getElementById(field + 'Field').checked = true;
+            });
+            
+
+            updateVisibleColumns();
+            
+
+            document.querySelectorAll('tbody tr').forEach(row => {
+                row.classList.remove('hidden');
+            });
+        }
+    </script>
 </body>
 </html>

@@ -5,7 +5,7 @@ from pymongo.server_api import ServerApi
 import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
-from statistics import median
+
 
 app = Flask(__name__)
 
@@ -43,38 +43,7 @@ def load_weather_data_to_mongodb(path):
 if collection.count_documents({}) == 0:
     load_weather_data_to_mongodb(path="testset.csv")
 
-def build_filter_query(start_date, end_date, temp_min=None, temp_max=None, 
-                      humidity_min=None, humidity_max=None, 
-                      pressure_min=None, pressure_max=None):
-    query = {
-        'datetime_utc': {
-            '$gte': datetime.strptime(start_date, "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00.000"),
-            '$lte': datetime.strptime(end_date, "%Y-%m-%d").strftime("%Y-%m-%dT23:59:59.999")
-        }
-    }
-    
-    if temp_min is not None or temp_max is not None:
-        query[' _tempm'] = {}
-        if temp_min is not None:
-            query[' _tempm']['$gte'] = float(temp_min)
-        if temp_max is not None:
-            query[' _tempm']['$lte'] = float(temp_max)
 
-    if humidity_min is not None or humidity_max is not None:
-        query[' _hum'] = {}
-        if humidity_min is not None:
-            query[' _hum']['$gte'] = float(humidity_min)
-        if humidity_max is not None:
-            query[' _hum']['$lte'] = float(humidity_max)
-
-    if pressure_min is not None or pressure_max is not None:
-        query[' _pressurem'] = {}
-        if pressure_min is not None:
-            query[' _pressurem']['$gte'] = float(pressure_min)
-        if pressure_max is not None:
-            query[' _pressurem']['$lte'] = float(pressure_max)
-
-    return query
 
 @app.route("/", methods=['GET', 'POST'])
 def index_page():
@@ -109,7 +78,7 @@ def get_weather():
         return jsonify({"error": f"Error fetching weather data: {str(e)}"}), 500
 
 
-@app.route("/yearly-analysis", methods=['POST'])
+@app.route("/yearly_analysis", methods=['POST'])
 def yearly_analysis():
     try:
         year = request.form.get('year')
