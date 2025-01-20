@@ -14,7 +14,21 @@
             From: {{ start_date }} To: {{ end_date }}
         </h3>
 
+        <div class="text-center mt-4">
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+        
         {% if weather_data %}
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Temperature Data of Delhi</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <table class="table table-striped mt-4">
             <thead>
                 <tr>
@@ -36,12 +50,12 @@
             </tbody>
         </table>
         {% else %}
-        <p class="text-center mt-4 text-warning">No data available for the specified period.</p>
+        <p class="text-center mt-4 text-warning">No data available for the specified criteria.</p>
         {% endif %}
 
-        <div class="text-center mt-4">
-            <a href="/" class="btn btn-secondary">Back to Home</a>
-        </div>
+        
     </div>
+
+
 </body>
 </html>
